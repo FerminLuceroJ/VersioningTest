@@ -162,43 +162,49 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: module-version-check
-          path: module-version-check
+          path: module-version-check 
 
       - name: 🏷️ Asegurar existencia del label 'terraform'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh label list | grep -q '^terraform' || \
-          gh label create terraform --description "Issues relacionados con módulos de Terraform" --color 623CE4
+          gh label create terraform --description "Issues relacionados con módulos de Terraform" --color 623CE4    
 
       - name: 🐛 Crear o actualizar issues para módulos desactualizados
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+
+          # ========== (1) Iterate through each outdated module ==========
           while IFS="|" read -r pattern module used latest; do
             title="Upgrade(${pattern}): ${module} (${used} > ${latest})"
 
-            echo "🔍 Buscando issue existente para $module"
-            issue_data=$(gh issue list --state open --search "$pattern" --json title,number --jq \
-              '.[] | select(.title | contains("'"$pattern"'"))')
+            # ========== (2) Check if an issue already exists ==========
+            echo "🔍 Buscando issue existente para $pattern"
+            issue_data=$(gh issue list --state open --json title,number --jq \
+              '.[] | select(.title | startswith("Upgrade('"$pattern"'):"))')
 
+            # ========== (3) If it doesn't exist, create the issue ==========
             if [[ -z "$issue_data" ]]; then              
               echo "🌟 Creando issue: $title"
               gh issue create \
                 --title "$title" \
-                --body "El módulo \`${module}\` está desactualizado. - Pattern: \`${pattern}\` - Usado: \`${used}\` - Última versión: \`${latest}\`" \
+                --body "El módulo \`${module}\` está desactualizado. - Pattern: \`${pattern}\` - Usando: \`${used}\` - Última versión: \`${latest}\`" \
                 --label terraform
             else
               number=$(echo "$issue_data" | jq -r '.number')
               old_title=$(echo "$issue_data" | jq -r '.title')
 
+
+              # ========== (4) Si existe pero está desactualizado, lo actualizo ==========
               if [[ "$old_title" != *"$latest"* ]]; then
                 echo "✏️ Actualizando issue #$number con nueva versión"
                 gh issue edit "$number" \
                   --title "$title" \
-                  --body "El módulo \`${module}\` está desactualizado. - Pattern: \`${pattern}\` - Usado: \`${used}\` - Última versión: \`${latest}\`"
+                  --body "El módulo \`${module}\` está desactualizado. - Pattern: \`${pattern}\` - Usando: \`${used}\` - Última versión: \`${latest}\`"
               else
                 echo "✅ Issue ya existente y actualizado para $pattern"
               fi
             fi
-          done < module-version-check/module_issues.txt
+          done < module-version-check/module_issues.txt 

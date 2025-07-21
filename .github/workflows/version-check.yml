@@ -186,7 +186,7 @@ jobs:
               echo "🌟 Creando issue: $title"
               gh issue create \
                 --title "$title" \
-                --body "El módulo \`${module}\` está desactualizado.\n\n- Pattern: \`${pattern}\`\n- Usado: \`${used}\`\n- Última versión: \`${latest}\`" \
+                --body "El módulo \`${module}\` está desactualizado. - Pattern: \`${pattern}\` - Usado: \`${used}\` - Última versión: \`${latest}\`" \
                 --label terraform
             else
               number=$(echo "$issue_data" | jq -r '.number')
@@ -196,7 +196,7 @@ jobs:
                 echo "✏️ Actualizando issue #$number con nueva versión"
                 gh issue edit "$number" \
                   --title "$title" \
-                  --body "El módulo \`${module}\` está desactualizado.\n\n- Pattern: \`${pattern}\`\n- Usado: \`${used}\`\n- Última versión: \`${latest}\`"
+                  --body "El módulo \`${module}\` está desactualizado. - Pattern: \`${pattern}\` - Usado: \`${used}\` - Última versión: \`${latest}\`"
               else
                 echo "✅ Issue ya existente y actualizado para $pattern"
               fi

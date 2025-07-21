@@ -162,27 +162,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: module-version-check
-          path: module-version-check # Chequear aca
-
-      ##- name: 📝 Listar archivos subidos al artifact
-      ##  run: ls -lah . || true
-
-        # ========== Prepare environment with GitHub CLI ==========
-      #- name: 🛠️ Install GitHub CLI (gh)
-      #  run: |
-      #    type -p gh || (
-      #      curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && \
-      #      sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg && \
-      #      echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null && \
-      #      sudo apt update && sudo apt install gh -y
-      #    )
-      #    gh --version
-
-      ##- name: 📝 Listar archivos descargados
-      ##  run: ls -lR module-version-check || echo "No existe el directorio module-version-check"
-
-      ##- name: 📄 Mostrar contenido de module_issues.txt
-      ##  run: cat module-version-check/module_issues.txt
+          path: module-version-check 
 
       - name: 🐛 Crear o actualizar issues para módulos desactualizados
         env:
@@ -198,7 +178,14 @@ jobs:
             issue_data=$(gh issue list --state open --search "$pattern" --json title,number --jq \
               '.[] | select(.title | contains("'"$pattern"'"))')
 
-            # ========== (3) If it doesn't exist, create the issue ==========
+            # ========== (3) If it doesn't exist, create the issue ===========  
+          - name: 🏷️ Asegurar existencia del label 'terraform'
+            env:
+              GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            run: |
+              gh label list | grep -q '^terraform' || \
+              gh label create terraform --description "Issues relacionados con módulos de Terraform" --color 623CE4
+
             if [[ -z "$issue_data" ]]; then              
               echo "🌟 Creando issue: $title"
               gh issue create \

@@ -34,6 +34,8 @@ locals {
     "created-by"  = "GoCloud.la"
   }
 
+  default_aws_acm_certificate = "*.${local.common_name_prefix}.internal"
+
   # VPC Name
   vpc_name = local.common_name_prefix
   vpc_cidr = data.aws_vpc.this.cidr_block

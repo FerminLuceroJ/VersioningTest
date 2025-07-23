@@ -11,16 +11,16 @@ variable "project" {
 }
 
 /*----------------------------------------------------------------------*/
-/* ALB | Variable Definition                                            */
+/* RDS Aurora | Variable Definition                                     */
 /*----------------------------------------------------------------------*/
 
-variable "documentdb_parameters" {
+variable "rds_aurora_parameters" {
   type        = any
   description = ""
   default     = {}
 }
 
-variable "documentdb_defaults" {
+variable "rds_aurora_defaults" {
   description = "Map of default values which will be used for each item."
   type        = any
   default     = {}

@@ -19,6 +19,8 @@ locals {
     "created-by"  = "GoCloud.la"
   }
 
-  default_vpc_name = local.common_name_prefix
+  # VPC Name
+  default_vpc_name    = local.common_name_prefix
+  default_subnet_name = "${local.common_name_prefix}-private*"
 
 }

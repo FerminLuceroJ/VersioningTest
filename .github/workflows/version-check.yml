@@ -94,7 +94,7 @@ jobs:
               continue
             fi
 
-            LATEST_VERSION=$(echo "$RESPONSE" | jq -r '.modules[0].versions | map(.version) | sort | last')
+            LATEST_VERSION=$(echo "$RESPONSE" | jq -r '.modules[0].versions | map(.version) | sort_by(split(".") | map(tonumber)) | last')
 
             if [[ -z "$LATEST_VERSION" || "$LATEST_VERSION" == "null" ]]; then
               echo "⚠️ Could not determine latest version of \`${MODULE_PATH}\`" | tee -a "$OUTPUT_FILE"
